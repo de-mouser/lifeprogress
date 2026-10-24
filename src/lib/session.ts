@@ -1,0 +1,17 @@
+import { IronSessionOptions } from 'iron-session';
+
+export interface SessionData {
+  isOwner?: boolean;
+  loginTime?: number;
+}
+
+export const sessionOptions: IronSessionOptions = {
+  password: process.env.SESSION_SECRET as string,
+  cookieName: 'gate_tracker_session',
+  cookieOptions: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  },
+};
