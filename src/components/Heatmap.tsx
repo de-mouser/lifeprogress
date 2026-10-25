@@ -102,7 +102,6 @@ export default function Heatmap() {
             <div
               key={wi}
               className="heatmap-month-label"
-              style={{ width: 14 }}
             >
               {ml ? ml.label : ''}
             </div>
@@ -128,6 +127,17 @@ export default function Heatmap() {
                   '#2563eb',
                   '#3b82f6',
                 ];
+                const pctAttr = !day.hasData
+                  ? 'empty'
+                  : day.percentage === 0
+                  ? '0'
+                  : day.percentage < 50
+                  ? 'low'
+                  : day.percentage < 75
+                  ? 'mid'
+                  : day.percentage < 100
+                  ? 'high'
+                  : 'full';
                 const displayDate = new Date(day.date + 'T00:00:00').toLocaleDateString('en-IN', {
                   day: 'numeric', month: 'short', year: 'numeric',
                 });
@@ -136,6 +146,7 @@ export default function Heatmap() {
                     key={di}
                     className="heatmap-cell"
                     id={`heatmap-${day.date}`}
+                    data-pct={pctAttr}
                     style={{ background: levelColors[lvl] }}
                     onMouseEnter={(e) => {
                       const rect = (e.target as HTMLElement).getBoundingClientRect();

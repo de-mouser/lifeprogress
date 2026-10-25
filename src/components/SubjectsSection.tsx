@@ -29,9 +29,11 @@ interface SubjectsSectionProps {
 const SUBJECT_ICONS: Record<string, string> = {
   'Operating Systems': 'OS',
   'Computer Organization & Architecture': 'COA',
+  'Computer Organisation & Architecture': 'COA',
   'Theory of Computation': 'TOC',
   'Compiler Design': 'CD',
   'General Aptitude': 'APT',
+  'Aptitude & Reasoning': 'APT',
   'Engineering Mathematics': 'EM',
   'Discrete Mathematics': 'DM',
   'Programming & Data Structures': 'PDS',

@@ -138,6 +138,9 @@ export default function HomePage() {
         {/* ── Sleep Mode Banner ─────────────────────── */}
         <SleepSection isOwner={isOwner} />
 
+        {/* ── Current Activity ──────────────────────── */}
+        <ActivitySection isOwner={isOwner} />
+
         {/* ── Daily Goals ───────────────────────────── */}
         <CollapsibleSection title="Today's Goals" defaultOpen={true}>
           <DailyGoals isOwner={isOwner} />
@@ -212,24 +215,34 @@ function CollapsibleSection({
 function ActivityBadge() {
   const [activity, setActivity] = useState<string | null>(null);
 
+  const updateFromData = (actData: any) => {
+    if (actData?.activity) {
+      const map: Record<string, string> = {
+        studying: 'Studying',
+        working_out: 'Working Out',
+        taking_a_break: 'On Break',
+        sleeping: 'Sleeping',
+        eating: 'Eating',
+        working: 'Working',
+        other: 'Active',
+      };
+      setActivity(map[actData.activity] ?? actData.activity);
+    } else {
+      setActivity(null);
+    }
+  };
+
   useEffect(() => {
     fetch('/api/activity')
       .then((r) => r.json())
-      .then((d) => {
-        if (d.activity?.activity) {
-          const map: Record<string, string> = {
-            studying: 'Studying',
-            working_out: 'Working Out',
-            taking_a_break: 'On Break',
-            sleeping: 'Sleeping',
-            eating: 'Eating',
-            working: 'Working',
-            other: 'Active',
-          };
-          setActivity(map[d.activity.activity] ?? d.activity.activity);
-        }
-      })
+      .then((d) => updateFromData(d.activity))
       .catch(() => {});
+
+    const onUpdate = (e: any) => {
+      updateFromData(e.detail);
+    };
+    window.addEventListener('activity-updated', onUpdate);
+    return () => window.removeEventListener('activity-updated', onUpdate);
   }, []);
 
   if (!activity) return null;

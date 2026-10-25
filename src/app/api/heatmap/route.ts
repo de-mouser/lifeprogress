@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// GET /api/heatmap - get daily goal completion data for heatmap
+// GET /api/heatmap - get 365-day activity grid for heatmap
 export async function GET() {
-  // Get all daily periods with their goal completion
+  // Query periods from Supabase
   const { data: periods } = await supabase
     .from('daily_periods')
     .select('id, period_date')
     .eq('is_published', true)
     .order('period_date');
-
-  if (!periods || periods.length === 0) {
-    return NextResponse.json({ heatmap: [] });
-  }
 
   const { data: goals } = await supabase
     .from('daily_goals')
@@ -27,18 +23,42 @@ export async function GET() {
     });
   }
 
-  const heatmap = periods.map(p => {
-    const stats = goalsByPeriod.get(p.id);
-    return {
-      date: p.period_date,
-      total: stats?.total ?? 0,
-      completed: stats?.completed ?? 0,
-      percentage: stats && stats.total > 0
-        ? Math.round((stats.completed / stats.total) * 100)
-        : 0,
-      hasData: !!stats,
-    };
-  });
+  const periodByDate = new Map<string, string>();
+  for (const p of periods ?? []) {
+    periodByDate.set(p.period_date, p.id);
+  }
 
-  return NextResponse.json({ heatmap });
+  // Generate 52 full weeks (364 days) ending today in Asia/Kolkata
+  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+  const today = new Date(todayStr + 'T00:00:00');
+
+  const days: {
+    date: string;
+    total: number;
+    completed: number;
+    percentage: number;
+    hasData: boolean;
+  }[] = [];
+
+  for (let i = 363; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toLocaleDateString('en-CA');
+    const periodId = periodByDate.get(dateStr);
+    const stats = periodId ? goalsByPeriod.get(periodId) : undefined;
+    const hasData = !!stats && stats.total > 0;
+    const total = stats?.total ?? 0;
+    const completed = stats?.completed ?? 0;
+    const percentage = hasData ? Math.round((completed / total) * 100) : 0;
+
+    days.push({
+      date: dateStr,
+      total,
+      completed,
+      percentage,
+      hasData,
+    });
+  }
+
+  return NextResponse.json({ heatmap: days });
 }

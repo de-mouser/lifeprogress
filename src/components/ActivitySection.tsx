@@ -68,9 +68,13 @@ export default function ActivitySection({ isOwner }: { isOwner: boolean }) {
         }),
       });
       const d = await res.json();
-      setActivity(d.data ?? null);
+      const updated = d.activity ?? d.data ?? null;
+      setActivity(updated);
       setShowEdit(false);
       setDescription('');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('activity-updated', { detail: updated }));
+      }
     } catch {}
     setSaving(false);
   };
