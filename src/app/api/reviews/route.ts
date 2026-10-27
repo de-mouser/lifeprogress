@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseAdmin
     .from('daily_reviews')
-    .select('id, review_date, mood, what_went_well, what_to_improve, tomorrow_plan, sleep_time, wake_time, created_at')
+    .select('id, review_date, mood, what_went_well, what_to_improve, tomorrow_plan, sleep_time, wake_time, energy_level, exercise, created_at')
     .order('review_date', { ascending: false });
 
   if (dateParam) {
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   if (!session.isOwner) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await req.json();
-  const { mood, whatWentWell, whatToImprove, tomorrowPlan, sleepTime, wakeTime, reviewDate } = body;
+  const { mood, whatWentWell, whatToImprove, tomorrowPlan, sleepTime, wakeTime, energyLevel, exercise, reviewDate } = body;
 
   if (!whatWentWell?.trim()) {
     return NextResponse.json({ error: '"What went well" is required.' }, { status: 400 });
@@ -55,6 +55,8 @@ export async function POST(req: NextRequest) {
         tomorrow_plan: tomorrowPlan?.trim() || '',
         sleep_time: sleepTime?.trim() || null,
         wake_time: wakeTime?.trim() || null,
+        energy_level: energyLevel ? Number(energyLevel) : null,
+        exercise: exercise?.trim() || null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'review_date' }

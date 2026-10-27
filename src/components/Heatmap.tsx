@@ -19,6 +19,8 @@ export interface HeatmapDay {
     tomorrow_plan: string;
     sleep_time?: string | null;
     wake_time?: string | null;
+    energy_level?: number | null;
+    exercise?: string | null;
   } | null;
 }
 
@@ -194,13 +196,22 @@ export default function Heatmap({ isOwner = false }: { isOwner?: boolean }) {
               <span>S</span>
             </div>
 
-            <div className="heatmap-wrapper" style={{ paddingBottom: 0 }}>
+            <div className="heatmap-wrapper" style={{ width: '100%', paddingBottom: 0, overflowX: 'auto' }}>
               {/* Month labels */}
-              <div className="heatmap-month-labels">
+              <div
+                className="heatmap-month-labels"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${weeks.length}, minmax(18px, 1fr))`,
+                  width: '100%',
+                  gap: 4,
+                  textAlign: 'center',
+                }}
+              >
                 {weeks.map((_, wi) => {
                   const ml = monthLabels.find((m) => m.weekIndex === wi);
                   return (
-                    <div key={wi} className="heatmap-month-label" style={{ width: 12 }}>
+                    <div key={wi} className="heatmap-month-label" style={{ width: 'auto' }}>
                       {ml ? ml.label : ''}
                     </div>
                   );
@@ -208,12 +219,20 @@ export default function Heatmap({ isOwner = false }: { isOwner?: boolean }) {
               </div>
 
               {/* Grid columns */}
-              <div className="heatmap-grid">
+              <div
+                className="heatmap-grid"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${weeks.length}, minmax(18px, 1fr))`,
+                  width: '100%',
+                  gap: 4,
+                }}
+              >
                 {weeks.map((week, wi) => (
-                  <div key={wi} className="heatmap-col">
+                  <div key={wi} className="heatmap-col" style={{ width: '100%', gap: 3 }}>
                     {week.map((day, di) => {
                       if (!day.date) {
-                        return <div key={di} className="heatmap-cell" style={{ background: 'transparent', width: 12, height: 12 }} />;
+                        return <div key={di} className="heatmap-cell" style={{ background: 'transparent', width: '100%', height: 13 }} />;
                       }
 
                       const lvl = day.hasData ? Math.min(4, Math.ceil((day.percentage / 100) * 4)) : 0;
@@ -240,8 +259,8 @@ export default function Heatmap({ isOwner = false }: { isOwner?: boolean }) {
                           id={`heatmap-${day.date}`}
                           style={{
                             background: levelColors[lvl],
-                            width: 12,
-                            height: 12,
+                            width: '100%',
+                            height: 13,
                             cursor: 'pointer',
                             outline: day.hasReview ? '1.5px solid #a855f7' : undefined,
                             boxShadow: day.hasReview ? '0 0 6px rgba(168, 85, 247, 0.6)' : undefined,
@@ -375,12 +394,13 @@ export default function Heatmap({ isOwner = false }: { isOwner?: boolean }) {
                   </div>
                 </div>
 
-                {/* Sleep & Wake Metrics */}
-                {(selectedDay.review.sleep_time || selectedDay.review.wake_time) && (
+                {/* Sleep, Wake, Energy & Exercise Metrics */}
+                {(selectedDay.review.sleep_time || selectedDay.review.wake_time || selectedDay.review.energy_level || selectedDay.review.exercise) && (
                   <div
                     style={{
                       display: 'flex',
-                      gap: 16,
+                      flexWrap: 'wrap',
+                      gap: 12,
                       background: 'rgba(59, 130, 246, 0.08)',
                       border: '1px solid var(--accent-dim)',
                       borderRadius: 'var(--radius-sm)',
@@ -398,6 +418,18 @@ export default function Heatmap({ isOwner = false }: { isOwner?: boolean }) {
                       <div>
                         <span style={{ color: 'var(--text-muted)' }}>☀️ Woke up: </span>
                         <strong>{selectedDay.review.wake_time}</strong>
+                      </div>
+                    )}
+                    {selectedDay.review.energy_level && (
+                      <div>
+                        <span style={{ color: 'var(--text-muted)' }}>⚡ Energy: </span>
+                        <strong>{selectedDay.review.energy_level}/5</strong>
+                      </div>
+                    )}
+                    {selectedDay.review.exercise && (
+                      <div>
+                        <span style={{ color: 'var(--text-muted)' }}>🏋️ Exercise: </span>
+                        <strong>{selectedDay.review.exercise}</strong>
                       </div>
                     )}
                   </div>

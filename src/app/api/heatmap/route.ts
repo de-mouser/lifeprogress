@@ -16,7 +16,7 @@ export async function GET() {
 
   const { data: reviews } = await supabase
     .from('daily_reviews')
-    .select('id, review_date, mood, what_went_well, what_to_improve, tomorrow_plan, sleep_time, wake_time');
+    .select('id, review_date, mood, what_went_well, what_to_improve, tomorrow_plan, sleep_time, wake_time, energy_level, exercise');
 
   const goalsByPeriod = new Map<string, { total: number; completed: number }>();
   for (const goal of goals ?? []) {

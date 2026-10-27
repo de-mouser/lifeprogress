@@ -11,6 +11,8 @@ export interface Review {
   tomorrow_plan: string;
   sleep_time?: string | null;
   wake_time?: string | null;
+  energy_level?: number | null;
+  exercise?: string | null;
   created_at: string;
 }
 
@@ -20,6 +22,14 @@ export const MOOD_LABELS: Record<number, string> = {
   3: '😐 Okay',
   4: '🙂 Good',
   5: '😁 Great',
+};
+
+export const ENERGY_LABELS: Record<number, string> = {
+  1: '⚡ Low',
+  2: '⚡ Moderate',
+  3: '⚡ Good',
+  4: '⚡ High',
+  5: '⚡ Peak (Max)',
 };
 
 export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
@@ -36,6 +46,8 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
   const [tomorrowPlan, setTomorrowPlan] = useState('');
   const [sleepTime, setSleepTime] = useState('');
   const [wakeTime, setWakeTime] = useState('');
+  const [energyLevel, setEnergyLevel] = useState(3);
+  const [exercise, setExercise] = useState('');
 
   const fetchReviews = useCallback(async () => {
     try {
@@ -67,12 +79,16 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
           setTomorrowPlan(existing.tomorrow_plan);
           setSleepTime(existing.sleep_time || '');
           setWakeTime(existing.wake_time || '');
+          setEnergyLevel(existing.energy_level || 3);
+          setExercise(existing.exercise || '');
         } else {
           setWentWell('');
           setToImprove('');
           setTomorrowPlan('');
           setSleepTime('');
           setWakeTime('');
+          setEnergyLevel(3);
+          setExercise('');
           setMood(3);
         }
       }
@@ -97,6 +113,8 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
           tomorrowPlan: tomorrowPlan.trim(),
           sleepTime: sleepTime.trim() || null,
           wakeTime: wakeTime.trim() || null,
+          energyLevel,
+          exercise: exercise.trim() || null,
         }),
       });
       setMood(3);
@@ -105,6 +123,8 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
       setTomorrowPlan('');
       setSleepTime('');
       setWakeTime('');
+      setEnergyLevel(3);
+      setExercise('');
       setReviewDate('');
       setShowAddForm(false);
       await fetchReviews();
@@ -240,6 +260,38 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
             </div>
           </div>
 
+          {/* Energy & Exercise Tracking */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div>
+              <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                ⚡ Energy Level
+              </label>
+              <select
+                className="input"
+                value={energyLevel}
+                onChange={(e) => setEnergyLevel(Number(e.target.value))}
+              >
+                <option value={1}>⚡ 1 - Low (Exhausted)</option>
+                <option value={2}>⚡ 2 - Moderate (Sluggish)</option>
+                <option value={3}>⚡ 3 - Good (Balanced)</option>
+                <option value={4}>⚡ 4 - High (Driven)</option>
+                <option value={5}>⚡ 5 - Peak (Laser Focused)</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                🏋️ Exercise / Workout
+              </label>
+              <input
+                type="text"
+                className="input"
+                placeholder="e.g. 45m Gym, 5km run, Yoga, Rest"
+                value={exercise}
+                onChange={(e) => setExercise(e.target.value)}
+              />
+            </div>
+          </div>
+
           <div>
             <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               What went well? *
@@ -347,6 +399,8 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
                       setTomorrowPlan(review.tomorrow_plan);
                       setSleepTime(review.sleep_time || '');
                       setWakeTime(review.wake_time || '');
+                      setEnergyLevel(review.energy_level || 3);
+                      setExercise(review.exercise || '');
                       setShowAddForm(true);
                     }}
                   >
@@ -363,13 +417,14 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
               )}
             </div>
 
-            {/* Sleep & Wake metrics display */}
-            {(review.sleep_time || review.wake_time) && (
+            {/* Health & Routine Metrics display (Sleep, Wake, Energy, Exercise) */}
+            {(review.sleep_time || review.wake_time || review.energy_level || review.exercise) && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 12,
+                  flexWrap: 'wrap',
+                  gap: 10,
                   background: 'var(--bg-secondary)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--radius-sm)',
@@ -387,6 +442,16 @@ export default function ReviewSection({ isOwner }: { isOwner: boolean }) {
                 {review.wake_time && (
                   <span>
                     ☀️ <strong>Woke:</strong> {review.wake_time}
+                  </span>
+                )}
+                {review.energy_level && (
+                  <span>
+                    {ENERGY_LABELS[review.energy_level] || `⚡ Energy: ${review.energy_level}/5`}
+                  </span>
+                )}
+                {review.exercise && (
+                  <span>
+                    🏋️ <strong>Exercise:</strong> {review.exercise}
                   </span>
                 )}
               </div>
