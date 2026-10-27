@@ -13,7 +13,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE TABLE IF NOT EXISTS app_config (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   deployment_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  target_year INTEGER NOT NULL DEFAULT 2025,
+  target_year INTEGER NOT NULL DEFAULT 2027,
   timezone TEXT NOT NULL DEFAULT 'Asia/Kolkata',
   owner_secret_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

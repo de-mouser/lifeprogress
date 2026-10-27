@@ -64,7 +64,7 @@ Copy the output hash. Then insert your app config:
 
 ```sql
 INSERT INTO app_config (deployment_date, target_year, timezone, owner_secret_hash)
-VALUES (CURRENT_DATE, 2025, 'Asia/Kolkata', '<PASTE_HASH_HERE>');
+VALUES (CURRENT_DATE, 2027, 'Asia/Kolkata', '<PASTE_HASH_HERE>');
 ```
 
 > **Note:** The SQL migration already enables the `pgcrypto` extension. If you prefer to generate the hash with Node.js instead:
@@ -223,4 +223,4 @@ gate-tracker/
 
 ---
 
-*Built with ❤️ for GATE CS 2025. Under 100 Rank — let's go! 🚀*
+*Built for GATE CS 2027. Under 100 Rank - let's go!*

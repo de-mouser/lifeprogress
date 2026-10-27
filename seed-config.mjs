@@ -27,7 +27,7 @@ if (existing) {
 
 const { error } = await supabase.from('app_config').insert({
   deployment_date: new Date().toISOString().split('T')[0],
-  target_year: 2025,
+  target_year: 2027,
   timezone: 'Asia/Kolkata',
   owner_secret_hash: HASH,
 });

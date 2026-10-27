@@ -53,17 +53,47 @@ export default function HomePage() {
   const completed = tasksData?.totalCompleted ?? 0;
   const total = tasksData?.totalTasks ?? 72;
 
-  // Circumference for ring
-  const r = 68;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - (pct / 100) * circ;
+  // Video game level & rank title
+  const currentLevel = Math.min(10, Math.floor(pct / 10) + 1);
+  const rankTitle =
+    pct === 100
+      ? '🏆 AIR < 100 ELITE'
+      : pct >= 80
+      ? '⚡ GATE TOPPER'
+      : pct >= 60
+      ? '⚔️ SYLLABUS SLAYER'
+      : pct >= 40
+      ? '🔥 CONCEPT GRINDER'
+      : pct >= 20
+      ? '🛡️ APPRENTICE SCHOLAR'
+      : '🔰 RECRUIT CADET';
+
+  const nextMilestone =
+    pct < 25 ? 25 : pct < 50 ? 50 : pct < 75 ? 75 : pct < 100 ? 100 : 100;
 
   return (
     <div className="page-wrapper">
       {/* ── Top Bar ─────────────────────────────────── */}
       <header className="top-bar">
         <div className="top-bar-inner">
-          <span className="site-title">GATE Preparation</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="site-title">GATE CS 2027</span>
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '2px 7px',
+                borderRadius: 4,
+                background: 'rgba(56, 189, 248, 0.15)',
+                color: '#38bdf8',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                letterSpacing: '0.05em',
+              }}
+            >
+              MISSION 100
+            </span>
+          </div>
+
           <div className="top-bar-right">
             <ActivityBadge />
             <button
@@ -79,59 +109,78 @@ export default function HomePage() {
       </header>
 
       <main className="container">
-        {/* ── Hero ──────────────────────────────────── */}
-        <section className="hero">
-          <div className="hero-subtitle">Personal tracker · GATE CS 2025</div>
+        {/* ── Hero & Video Game Progress HUD ────────────── */}
+        <section className="hero" style={{ paddingBottom: 16 }}>
+          <div className="hero-subtitle">Personal tracker · GATE CS 2027</div>
           <div className="hero-goal">🎯 Under 100 Rank</div>
 
-          {/* Ring progress */}
-          <div className="progress-center">
-            <div className="progress-ring-wrapper">
-              <svg className="progress-ring" width="160" height="160" viewBox="0 0 160 160">
-                <circle className="progress-ring-bg" cx="80" cy="80" r={r} />
-                <circle
-                  className="progress-ring-fill"
-                  cx="80"
-                  cy="80"
-                  r={r}
-                  strokeDasharray={circ}
-                  strokeDashoffset={loading ? circ : offset}
-                />
-              </svg>
-              <div className="progress-ring-text">
-                <div className="progress-pct">{pct}%</div>
-                <div className="progress-label">Overall</div>
+          {/* 🎮 Video Game Horizontal XP Progress Bar HUD */}
+          <div className="game-progress-wrapper" role="region" aria-label="GATE CS 2027 XP Bar">
+            <div className="game-hud-top">
+              <div className="game-rank-badge">
+                <span className="game-rank-icon">⚡</span>
+                <span>LVL {currentLevel} · {rankTitle}</span>
+              </div>
+              <div className="game-xp-counter">
+                <span>EXP: {completed} / {total} TASKS</span>
+                <span className="game-xp-pct">{pct}%</span>
               </div>
             </div>
 
-            <div className="progress-stats">
-              <div className="stat-item">
-                <div className="stat-value">{completed}</div>
-                <div className="stat-label">Done</div>
+            {/* Main Long Horizontal Bar */}
+            <div className="game-bar-track">
+              <div
+                className="game-bar-fill"
+                style={{ width: `${loading ? 0 : Math.max(2, pct)}%` }}
+              />
+            </div>
+
+            {/* Milestones / Notches */}
+            <div className="game-notches-row">
+              <div className="game-notch-item">
+                <div className={`game-notch-point ${pct >= 0 ? 'active' : ''}`} />
+                <span>0% Start</span>
               </div>
-              <div className="stat-item">
-                <div className="stat-value">{total - completed}</div>
-                <div className="stat-label">Left</div>
+              <div className="game-notch-item">
+                <div className={`game-notch-point ${pct >= 25 ? 'active' : ''}`} />
+                <span>25% Core</span>
               </div>
-              <div className="stat-item">
-                <div className="stat-value">12</div>
-                <div className="stat-label">Subjects</div>
+              <div className="game-notch-item">
+                <div className={`game-notch-point ${pct >= 50 ? 'active' : ''}`} />
+                <span>50% Mid</span>
+              </div>
+              <div className="game-notch-item">
+                <div className={`game-notch-point ${pct >= 75 ? 'active' : ''}`} />
+                <span>75% Master</span>
+              </div>
+              <div className="game-notch-item">
+                <div className={`game-notch-point ${pct >= 100 ? 'active' : ''}`} />
+                <span>100% Rank &lt;100</span>
               </div>
             </div>
 
-            <p className="progress-message">
-              {pct === 0
-                ? 'Every expert was once a beginner. Start today.'
-                : pct < 25
-                ? 'Great start! Keep the momentum going.'
-                : pct < 50
-                ? 'Almost halfway there. Stay consistent!'
-                : pct < 75
-                ? 'Past the halfway mark. The finish line is closer!'
-                : pct < 100
-                ? 'Almost there! Push through the final stretch!'
-                : '🏆 All tasks complete! Under 100 Rank incoming!'}
-            </p>
+            {/* HUD Stats */}
+            <div className="game-hud-stats">
+              <div className="game-hud-stat-box">
+                <div className="game-hud-stat-val" style={{ color: '#10b981' }}>{completed}</div>
+                <div className="game-hud-stat-lbl">Tasks Done</div>
+              </div>
+              <div className="game-hud-stat-box">
+                <div className="game-hud-stat-val" style={{ color: '#38bdf8' }}>{total - completed}</div>
+                <div className="game-hud-stat-lbl">Tasks Remaining</div>
+              </div>
+              <div className="game-hud-stat-box">
+                <div className="game-hud-stat-val" style={{ color: '#a855f7' }}>12</div>
+                <div className="game-hud-stat-lbl">GATE Subjects</div>
+              </div>
+            </div>
+
+            {/* Quest motivational message */}
+            <div className="game-quest-status">
+              {pct === 100
+                ? '🏆 Quest Complete! Full syllabus conquered. Under 100 Rank unlocked!'
+                : `⚔️ CURRENT QUEST: Clear PYQs, lectures & revision modules. Next milestone at ${nextMilestone}%.`}
+            </div>
           </div>
         </section>
 
@@ -141,41 +190,66 @@ export default function HomePage() {
         {/* ── Current Activity ──────────────────────── */}
         <ActivitySection isOwner={isOwner} />
 
-        {/* ── Daily Goals ───────────────────────────── */}
-        <CollapsibleSection title="Today's Goals" defaultOpen={true}>
-          <DailyGoals isOwner={isOwner} />
-        </CollapsibleSection>
+        {/* ── Subjects & Tasks (Fixed directly below progress bar!) ──────── */}
+        <div className="section" style={{ marginBottom: 24 }}>
+          <div className="section-static-header">
+            <span className="section-title">📚 Subjects &amp; Tasks (72 Tasks · 12 Subjects)</span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              {completed}/{total} Completed ({pct}%)
+            </span>
+          </div>
+          <div style={{ padding: '16px 18px' }}>
+            <SubjectsSection
+              subjects={tasksData?.subjects ?? []}
+              isOwner={isOwner}
+              onUpdate={fetchTasks}
+              loading={loading}
+            />
+          </div>
+        </div>
 
-        {/* ── Subjects & Tasks ──────────────────────── */}
-        <CollapsibleSection title="Subjects & Tasks" defaultOpen={true}>
-          <SubjectsSection
-            subjects={tasksData?.subjects ?? []}
-            isOwner={isOwner}
-            onUpdate={fetchTasks}
-            loading={loading}
-          />
-        </CollapsibleSection>
+        {/* ── Dashboard Two-Column Grid ────────────────────────── */}
+        <div className="dashboard-grid">
+          {/* Left Column: Today's Goals + Weekly/Monthly Plan */}
+          <div className="dashboard-col dashboard-left">
+            {/* Today's Goals */}
+            <CollapsibleSection title="🎯 Today's Goals" defaultOpen={true}>
+              <DailyGoals isOwner={isOwner} />
+            </CollapsibleSection>
 
-        {/* ── Activity Heatmap ──────────────────────── */}
-        <CollapsibleSection title="Activity Heatmap" defaultOpen={false}>
-          <Heatmap />
-        </CollapsibleSection>
+            {/* Weekly / Monthly Plan */}
+            <CollapsibleSection title="📋 Weekly / Monthly Game Plan" defaultOpen={true}>
+              <GamePlanSection isOwner={isOwner} />
+            </CollapsibleSection>
+          </div>
 
-        {/* ── Game Plan ─────────────────────────────── */}
-        <CollapsibleSection title="Weekly / Monthly Plan" defaultOpen={false}>
-          <GamePlanSection isOwner={isOwner} />
-        </CollapsibleSection>
+          {/* Right Column: Preparation Problems + Daily Reviews */}
+          <div className="dashboard-col dashboard-right">
+            {/* Preparation Problems (Fixed, not a dropdown!) */}
+            <div className="section">
+              <div className="section-static-header">
+                <span className="section-title">🐛 Preparation Problems</span>
+              </div>
+              <div style={{ padding: '16px 18px' }}>
+                <ProblemsSection isOwner={isOwner} />
+              </div>
+            </div>
 
-        {/* ── Daily Reviews ─────────────────────────── */}
-        <CollapsibleSection title="Daily Reviews" defaultOpen={false}>
-          <ReviewSection isOwner={isOwner} />
-        </CollapsibleSection>
-
-        {/* ── Preparation Problems ──────────────────── */}
-        <CollapsibleSection title="Preparation Problems" defaultOpen={false}>
-          <ProblemsSection isOwner={isOwner} />
-        </CollapsibleSection>
+            {/* Daily Reviews (Fixed below problems, with anchor for heatmap jumps) */}
+            <div className="section" id="review-section-anchor">
+              <div className="section-static-header">
+                <span className="section-title">📝 Daily Reviews &amp; Sleep Tracker</span>
+              </div>
+              <div style={{ padding: '16px 18px' }}>
+                <ReviewSection isOwner={isOwner} />
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
+
+      {/* ── Fixed Bottom Heatmap Dock (Oct 28 - Feb 7) ───────────────── */}
+      <Heatmap isOwner={isOwner} />
 
       {/* ── Auth Modal ────────────────────────────── */}
       {showAuth && (
